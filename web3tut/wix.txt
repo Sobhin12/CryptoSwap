@@ -1,0 +1,111 @@
+<!-- Add this in the Custom Code section of the Page Settings -->
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+// Import web3.js if not already imported
+import Web3 from 'web3';
+
+$w.onReady(function () {
+    // This function is called when the page is loaded
+    const apiKey = 'PFocZ8GDXRTizf2h9yAO2XjoycWYbdWk';
+    const alchemyUrl = `https://eth-sepolia.g.alchemy.com/v2/${apiKey}`;
+    const web3 = new Web3(alchemyUrl);
+
+    const abiPool = JSON.parse(`
+        YOUR_ABI_POOL_HERE
+    `);
+
+    const abiToken1 = JSON.parse(`
+        YOUR_ABI_TOKEN1_HERE
+    `);
+
+    const abiToken2 = JSON.parse(`
+        YOUR_ABI_TOKEN2_HERE
+    `);
+
+    const contractAddressPool = '0xa2132cd11db56F5Bfcc3960aEce020F15308FeB5';
+    const contractAddressToken1 = '0xd03e6908eD29F08636571c619A4Db5E7abF305b6';
+    const contractAddressToken2 = '0xAC97202BB804B1B0D769FbE6f707c9D3AeDBC1fC';
+
+    const lp = new web3.eth.Contract(abiPool, contractAddressPool);
+    const token1 = new web3.eth.Contract(abiToken1, contractAddressToken1);
+    const token2 = new web3.eth.Contract(abiToken2, contractAddressToken2);
+
+    const privateKey = '0x53010872b20ee8a3e0c186a9d61761aee7f696364ca246fff337bd8dcad175fd';
+    const account = web3.eth.accounts.wallet.add(privateKey);
+    const senderAddress = account.address;
+
+    async function sendTransaction(contract, method, args) {
+        try {
+            const gasEstimate = await contract.methods[method](...args).estimateGas({ from: senderAddress });
+            console.log(`Estimated gas for ${method}: ${gasEstimate}`);
+
+            const tx = {
+                from: senderAddress,
+                to: contract.options.address,
+                data: contract.methods[method](...args).encodeABI(),
+                gas: gasEstimate + 50000 // Adding a buffer to the gas estimate
+            };
+
+            const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+            const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+            console.log(`${method} transaction receipt:`, receipt);
+            return receipt;
+        } catch (error) {
+            console.error(`Error sending transaction for method ${method}:`, error.message);
+            if (error.receipt) {
+                console.error('Transaction receipt:', error.receipt);
+            }
+            throw error;
+        }
+    }
+
+    // Function to handle button click
+    async function handleProvideLiquidity() {
+        try {
+            const data1 = await sendTransaction(token1, 'adder', []);
+            const data2 = await sendTransaction(token2, 'adder', []);
+            console.log('Adder result for token1:', data1);
+            console.log('Adder result for token2:', data2);
+
+            const balance1 = await token1.methods.balance_caller().call({ from: senderAddress });
+            const balance2 = await token2.methods.balance_caller().call({ from: senderAddress });
+            console.log('Balance caller result for token1:', balance1);
+            console.log('Balance caller result for token2:', balance2);
+
+            const approveAmount = web3.utils.toWei('148', 'ether');
+            const approve1 = await sendTransaction(token1, 'approve', [contractAddressPool, approveAmount]);
+            const approve2 = await sendTransaction(token2, 'approve', [contractAddressPool, approveAmount]);
+            console.log('Approve result for token1:', approve1);
+            console.log('Approve result for token2:', approve2);
+
+            const provideLiquidity = await sendTransaction(lp, 'liquidityproviders', [2, 2]);
+            console.log('Provide liquidity result:', provideLiquidity);
+
+            const accountBalance = await lp.methods.accountBalance().call({ from: senderAddress });
+            console.log('Account Balance:', accountBalance);
+
+            const publicVariable = await lp.methods.balanceOf(senderAddress).call({ from: senderAddress });
+            console.log('Balance Of:', publicVariable);
+        } catch (error) {
+            console.error('Error during contract interaction:', error.message);
+        }
+    }
+
+    // Add event listener to the button
+    $w('#provideLiquidityButton').onClick(handleProvideLiquidity);
+});
+
+Steps to Integrate:
+Include Web3.js Library: Add the Web3.js library via a CDN in the Page Settings.
+
+Add Script in Wix Code: Add the above script in the Page Code section. Make sure to replace YOUR_ABI_POOL_HERE, YOUR_ABI_TOKEN1_HERE, and YOUR_ABI_TOKEN2_HERE with the actual ABI contents of your smart contracts.
+
+UI Elements: Ensure that you have a button with the ID #provideLiquidityButton on your Wix page. This button will trigger the provideLiquidity function.
+
+Test the Integration: Publish your Wix site and test the button to see if it triggers the transaction and interacts with the smart contracts as expected.
+
+Important Notes:
+Security: Storing private keys directly in the frontend code is highly insecure. For production, consider using a secure method to manage private keys, such as integrating with a wallet provider like MetaMask or using a backend server to sign transactions securely.
+Handling Web3 Wallets: For a more secure approach, consider using web3 wallets like MetaMask to manage user accounts and sign transactions.
+By following these steps, you can integrate your web3.js script with a Wix frontend and allow users to interact with your smart contracts through your Wix site.
+
