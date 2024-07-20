@@ -1028,7 +1028,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-06-25T18:02:56.219Z",
+  "updatedAt": "2024-07-20T06:33:13.806Z",
   "devdoc": {
     "custom:dev-run-script": "./scripts/deploy_with_ethers.ts",
     "details": "Store & retrieve value in a variable",

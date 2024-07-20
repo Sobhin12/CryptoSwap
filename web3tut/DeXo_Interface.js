@@ -1,21 +1,22 @@
-const { Web3 } = require("web3");
+const { Web3}  = require("web3");
 const fs = require('fs');
 
 async function read() {
-    const web3 = new Web3("https://eth-sepolia.g.alchemy.com/v2/PFocZ8GDXRTizf2h9yAO2XjoycWYbdWk");
+    //const web3 = new Web3("https://eth-sepolia.g.alchemy.com/v2/PFocZ8GDXRTizf2h9yAO2XjoycWYbdWk");
+    const web3 =  new Web3("http://127.0.0.1:7545");
       
-const abiData = fs.readFileSync('C:\\Users\\sobhi\\OneDrive\\Desktop\\truffle\\build\\contracts\\pool.json');
+const abiData = fs.readFileSync('C:\\Users\\sobhi\\OneDrive\\Desktop\\truffle\\CryptoSwap\\build\\contracts\\pool.json');
 const abi = JSON.parse(abiData).abi;
 
-const abiData2 = fs.readFileSync('C:\\Users\\sobhi\\OneDrive\\Desktop\\truffle\\build\\contracts\\token1.json');
+const abiData2 = fs.readFileSync('C:\\Users\\sobhi\\OneDrive\\Desktop\\truffle\\CryptoSwap\\build\\contracts\\token1.json');
 const abi2 = JSON.parse(abiData2).abi;
 
-const abiData3 = fs.readFileSync('C:\\Users\\sobhi\\OneDrive\\Desktop\\truffle\\build\\contracts\\token2.json');
+const abiData3 = fs.readFileSync('C:\\Users\\sobhi\\OneDrive\\Desktop\\truffle\\CryptoSwap\\build\\contracts\\token2.json');
 const abi3 = JSON.parse(abiData3).abi;
 
-        const contractaddress1 = "0x4d3c338DaB31ec9C508750e28AE41bb0505AccEF"; //lp
-        const contractaddress2 = "0x0FE4733c9b297e11254c627CaDacAcC2d128588B"; //token1
-        const contractaddress3 = "0x02F06B8782b6d177Ae54c7E76D135141d33bfC64"; //token2
+        const contractaddress1 = "0xE5BDeA7fa0f31d9A3ffAdE290919b824642fb0da"; //lp
+        const contractaddress2 = "0xe5B753563CD53571faB00ae003A245cAE34cb7be"; //token1
+        const contractaddress3 = "0xb560a5aAd55a04e1B393a37D6bcc844f07422313"; //token2
 
         const lp = new web3.eth.Contract(abi,contractaddress1); // for liquiditypool.sol
         const token1 = new web3.eth.Contract(abi2,contractaddress2);
@@ -31,7 +32,7 @@ const abi3 = JSON.parse(abiData3).abi;
 
 // Add the new account to the wallet
 web3.eth.handleRevert = true;
-  web3.eth.accounts.wallet.add( (('0x53010872b20ee8a3e0c186a9d61761aee7f696364ca246fff337bd8dcad175fd')) );
+  web3.eth.accounts.wallet.add( (('0x240f81a4cb4aefd449f3b5d8ac76bded3313d18d4f8fd6076b480606a65557cf')) );
                                  
   function listWalletAccounts() {
     const wallet = web3.eth.accounts.wallet;
@@ -44,7 +45,7 @@ web3.eth.handleRevert = true;
 
 // List the accounts
 listWalletAccounts();
-let c = "0x50a8466b021A34EBb073ef61C24017be9325396A"
+let c = "0xfC73B561B642fBeCA9D1F9a0B56D0273aD0D5Df9"
  
          const data1 = await token1.methods.adder().send({from: c});
          const data2 = await token2.methods.adder().send({from: c});
